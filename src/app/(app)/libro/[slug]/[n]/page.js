@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
 import { getUser } from "@/lib/auth";
 import { getBook, getChapter } from "@/lib/content";
 import { loadProgress, bookStates } from "@/lib/progress";
@@ -40,6 +40,22 @@ export default async function Capitulo({ params }) {
       <div className="card p-5">
         <p className="leading-relaxed">{ch.intro}</p>
       </div>
+
+      {ch.terms.length > 0 && (
+        <div className="card p-5">
+          <h2 className="heading mb-3 flex items-center gap-2 text-lg font-semibold">
+            <Lightbulb size={18} className="text-accent" /> Para entender este capítulo
+          </h2>
+          <dl className="space-y-3">
+            {ch.terms.map(([term, def]) => (
+              <div key={term}>
+                <dt className="text-sm font-semibold text-accent">{term}</dt>
+                <dd className="text-sm leading-relaxed text-muted">{def}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
 
       {ch.verse && (
         <blockquote className="rounded-xl2 border-l-4 p-5" style={{ borderColor: "var(--accent)", background: "var(--surface)" }}>
