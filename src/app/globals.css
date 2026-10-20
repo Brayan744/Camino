@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #faf6ee;
+  --surface: #fffdf8;
+  --ink: #1f2433;
+  --muted: #6b7080;
+  --line: #e8e0cf;
+  --brand: #2d3a6b;
+  --accent: #b8860b;
+  --sea: #dbe7f0;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1220;
+  --surface: #181c2e;
+  --ink: #ece8dc;
+  --muted: #9aa0b5;
+  --line: #2a2f47;
+  --brand: #8fa0ff;
+  --accent: #e0b44c;
+  --sea: #1b2a44;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+@layer components {
+  .card { @apply rounded-xl2 border border-line bg-surface shadow-soft; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-95; }
+  .btn-primary { @apply btn bg-brand text-bg hover:opacity-90; }
+  .btn-ghost { @apply btn border border-line text-ink hover:bg-line; }
+  .heading { @apply font-serif tracking-tight text-ink; }
+  .eyebrow { @apply text-xs font-medium uppercase tracking-widest text-accent; }
+  .input { @apply w-full rounded-xl border border-line bg-bg px-4 py-3 text-ink outline-none focus:border-brand; }
+}
