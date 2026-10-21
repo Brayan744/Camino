@@ -5,9 +5,9 @@ import { getUser } from "@/lib/auth";
 import { getBook, getChapter } from "@/lib/content";
 import { loadProgress, bookStates } from "@/lib/progress";
 import ReadButton from "@/components/ReadButton";
-import Chat from "@/components/Chat";
+import ChapterTabs from "@/components/ChapterTabs";
 
-export default async function Capitulo({ params }) {
+export default async function Capitulo({ params, searchParams }) {
   const u = await getUser();
   const book = getBook(params.slug);
   const n = parseInt(params.n, 10);
@@ -28,13 +28,16 @@ export default async function Capitulo({ params }) {
     .map((c) => getChapter(book.slug, c).title);
 
   return (
-    <div className="space-y-5">
-      <div>
-        <Link href={`/libro/${book.slug}`} className="text-sm text-muted">← {book.name}</Link>
-        <p className="eyebrow mt-3">{book.name} · capítulo {n} de {book.chapters}</p>
-        <h1 className="heading text-3xl font-semibold">{ch.title}</h1>
-      </div>
-
+    <ChapterTabs
+      key={`${book.slug}-${n}`}
+      book={book.slug}
+      chapter={n}
+      backHref={`/libro/${book.slug}`}
+      backLabel={book.name}
+      eyebrow={`${book.name} · capítulo ${n} de ${book.chapters}`}
+      title={ch.title}
+      initial={searchParams?.tab === "chat" ? "chat" : "read"}
+    >
       {ch.image && <img src={ch.image} alt={ch.title} className="w-full rounded-xl2 border border-line" />}
 
       <div className="card p-5">
@@ -74,12 +77,7 @@ export default async function Capitulo({ params }) {
       <p className="text-sm text-muted">Lean {book.name} {n} en su Reina Valera 1960 y vuelvan aquí para marcarlo.</p>
       <ReadButton book={book.slug} chapter={n} done={isDone} />
 
-      <section>
-        <h2 className="heading mb-3 text-xl font-semibold">Chat del capítulo</h2>
-        <Chat book={book.slug} chapter={n} />
-      </section>
-
-      <div className="flex justify-between text-sm">
+      <div className="flex justify-between pb-14 text-sm">
         {n > 1 ? (
           <Link href={`/libro/${book.slug}/${n - 1}`} className="btn-ghost"><ChevronLeft size={16} /> Anterior</Link>
         ) : <span />}
@@ -87,6 +85,6 @@ export default async function Capitulo({ params }) {
           <Link href={`/libro/${book.slug}/${n + 1}`} className="btn-ghost">Siguiente <ChevronRight size={16} /></Link>
         ) : <span />}
       </div>
-    </div>
+    </ChapterTabs>
   );
 }

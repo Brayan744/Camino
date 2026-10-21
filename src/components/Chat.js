@@ -51,7 +51,7 @@ export default function Chat({ book, chapter }) {
   }, []);
 
   useEffect(() => {
-    box.current?.scrollTo({ top: box.current.scrollHeight, behavior: "smooth" });
+    box.current?.scrollTo({ top: box.current.scrollHeight, behavior: "auto" });
   }, [msgs.length]);
 
   async function send(file, ignoreText, dur) {
@@ -113,8 +113,8 @@ export default function Chat({ book, chapter }) {
   const mmss = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
 
   return (
-    <div className="card overflow-hidden">
-      <div ref={box} className="h-[24rem] space-y-2.5 overflow-y-auto p-4" style={{ background: "color-mix(in srgb, var(--line) 25%, transparent)" }}>
+    <div className="card flex h-full flex-col overflow-hidden">
+      <div ref={box} className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain p-4" style={{ background: "color-mix(in srgb, var(--line) 25%, transparent)" }}>
         {msgs.length === 0 && (
           <p className="pt-16 text-center text-sm text-muted">Aún no hay mensajes. Escribe lo primero que te llamó la atención.</p>
         )}
@@ -150,7 +150,7 @@ export default function Chat({ book, chapter }) {
 
       {error && <p className="px-4 pb-2 pt-2 text-xs text-red-600">{error}</p>}
 
-      <div className="flex items-center gap-2 border-t border-line bg-surface p-3">
+      <div className="flex shrink-0 items-center gap-2 border-t border-line bg-surface p-3">
         {rec ? (
           <>
             <span className="flex-1 pl-2 text-sm text-red-600">● Grabando {mmss}</span>

@@ -1,4 +1,4 @@
-const CACHE = "camino-v2";
+const CACHE = "camino-v3";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => {
@@ -43,7 +43,7 @@ self.addEventListener("push", (e) => {
         badge: "/icons/192",
         tag: d.tag || undefined,
         renotify: !!d.tag,
-        data: { url: d.url || "/inicio" },
+        data: { url: (d.url || "/inicio") + (d.kind === "chat" ? "?tab=chat" : "") },
       });
     })()
   );

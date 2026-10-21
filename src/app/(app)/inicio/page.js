@@ -33,6 +33,28 @@ export default async function Inicio() {
         <h1 className="heading text-3xl font-semibold">Su camino de lectura</h1>
       </div>
 
+      <Link
+        href={finished ? `/libro/${current.slug}` : `/libro/${current.slug}/${next}`}
+        className="card flex items-center justify-between p-5 transition hover:opacity-90"
+      >
+        <div>
+          <p className="eyebrow">{finished ? "Libro completado" : "Continuar"}</p>
+          <p className="heading mt-1 text-xl font-semibold">
+            {finished ? current.name : `${current.name} ${next}`}
+          </p>
+        </div>
+        <ChevronRight className="text-muted" />
+      </Link>
+
+      <StreakCard
+        count={st.count}
+        best={st.best}
+        todayDone={st.todayDone}
+        rescue={st.rescue}
+        week={st.week}
+        savers={st.savers}
+      />
+
       <div className="card flex items-center gap-5 p-5">
         <div className="shrink-0">
           <ProgressRing value={rows.length} total={total} size={128} stroke={12}>
@@ -49,29 +71,7 @@ export default async function Inicio() {
         </div>
       </div>
 
-      <StreakCard
-        count={st.count}
-        best={st.best}
-        todayDone={st.todayDone}
-        rescue={st.rescue}
-        week={st.week}
-        savers={st.savers}
-      />
-
       <PushPrompt />
-
-      <Link
-        href={finished ? `/libro/${current.slug}` : `/libro/${current.slug}/${next}`}
-        className="card flex items-center justify-between p-5 transition hover:opacity-90"
-      >
-        <div>
-          <p className="eyebrow">{finished ? "Libro completado" : "Continuar"}</p>
-          <p className="heading mt-1 text-xl font-semibold">
-            {finished ? current.name : `${current.name} ${next}`}
-          </p>
-        </div>
-        <ChevronRight className="text-muted" />
-      </Link>
 
       <section>
         <h2 className="heading mb-3 text-xl font-semibold">Libros</h2>
