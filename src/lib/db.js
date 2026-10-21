@@ -33,7 +33,31 @@ CREATE TABLE IF NOT EXISTS messages (
   file TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMPTZ;
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS dur INT;
 CREATE INDEX IF NOT EXISTS messages_chapter_idx ON messages (couple_id, book, chapter, id);
+CREATE TABLE IF NOT EXISTS push_subs (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT UNIQUE NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS freezes (
+  couple_id INT REFERENCES couples(id) ON DELETE CASCADE,
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  day TEXT NOT NULL,
+  month TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (couple_id, day)
+);
+CREATE TABLE IF NOT EXISTS reminders_log (
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  day TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  PRIMARY KEY (user_id, day, kind)
+);
 `;
 
 const g = globalThis;

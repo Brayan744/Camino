@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  experimental: { serverComponentsExternalPackages: ["pg"] },
+  experimental: {
+    instrumentationHook: true,
+    serverComponentsExternalPackages: ["pg", "web-push"],
+  },
 };

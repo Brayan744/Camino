@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { getBook } from "@/lib/content";
 import { loadProgress, bookStates } from "@/lib/progress";
+import { pushToPartners } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 const bad = (m, s = 400) => NextResponse.json({ error: m }, { status: s });
@@ -30,6 +31,13 @@ export async function POST(req) {
         "insert into messages(couple_id, book, chapter, user_id, kind, body) values($1,$2,$3,$4,'system',$5)",
         [u.couple_id, book, n, u.id, `${u.name} marcó este capítulo como leído ✓`]
       );
+      pushToPartners(u.couple_id, u.id, {
+        kind: "progress",
+        title: `${u.name} leyó ${b.name} ${n} ✓`,
+        body: "Ya terminó este capítulo. ¿Te toca a ti?",
+        url: `/libro/${book}/${n}`,
+        tag: `read-${book}-${n}`,
+      }).catch(() => {});
     }
   } else {
     await p.query("delete from progress where couple_id=$1 and book=$2 and chapter=$3", [u.couple_id, book, n]);

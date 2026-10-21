@@ -1,17 +1,22 @@
 import Link from "next/link";
-import { Flame, Lock, ChevronRight } from "lucide-react";
+import { Lock, ChevronRight } from "lucide-react";
 import { getUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { loadProgress, bookStates, streak } from "@/lib/progress";
+import { loadProgress, bookStates } from "@/lib/progress";
+import { loadStreak } from "@/lib/streak";
 import ProgressRing from "@/components/ProgressRing";
 import ProgressBar from "@/components/ProgressBar";
+import StreakCard from "@/components/StreakCard";
+import PushPrompt from "@/components/PushPrompt";
 
 export default async function Inicio() {
   const u = await getUser();
   const rows = await loadProgress(u.couple_id);
   const states = bookStates(rows);
   const total = states.reduce((a, b) => a + b.chapters, 0);
-  const racha = streak(rows);
+  const pct = total ? Math.round((rows.length / total) * 100) : 0;
+  const st = await loadStreak(u.couple_id, u.id);
+
   const current = states.find((b) => b.unlocked && !b.complete) || states[states.length - 1];
   const doneSet = new Set(rows.filter((r) => r.book === current.slug).map((r) => r.chapter));
   let next = 1;
@@ -29,19 +34,31 @@ export default async function Inicio() {
       </div>
 
       <div className="card flex items-center gap-5 p-5">
-        <ProgressRing value={rows.length} total={total}>
-          <div className="heading text-2xl font-semibold">{Math.round((rows.length / total) * 100)}%</div>
-          <div className="text-[10px] uppercase tracking-wider text-muted">del Pentateuco</div>
-        </ProgressRing>
-        <div className="flex-1">
-          <p className="text-sm text-muted">{rows.length} de {total} capítulos leídos</p>
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-sm">
-            <Flame size={16} className="text-accent" />
-            <span className="font-medium">{racha}</span>
-            <span className="text-muted">{racha === 1 ? "día seguido" : "días seguidos"}</span>
-          </div>
+        <div className="shrink-0">
+          <ProgressRing value={rows.length} total={total} size={128} stroke={12}>
+            <div className="heading text-3xl font-semibold leading-none">
+              {pct}
+              <span className="text-base text-muted">%</span>
+            </div>
+          </ProgressRing>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow">Pentateuco</p>
+          <p className="heading mt-1 text-2xl font-semibold">{rows.length} de {total}</p>
+          <p className="text-sm text-muted">capítulos leídos</p>
         </div>
       </div>
+
+      <StreakCard
+        count={st.count}
+        best={st.best}
+        todayDone={st.todayDone}
+        rescue={st.rescue}
+        week={st.week}
+        savers={st.savers}
+      />
+
+      <PushPrompt />
 
       <Link
         href={finished ? `/libro/${current.slug}` : `/libro/${current.slug}/${next}`}

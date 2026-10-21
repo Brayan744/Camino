@@ -1,4 +1,5 @@
-const CACHE = "camino-v1";
+const CACHE = "camino-v2";
+
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => {
   e.waitUntil(
@@ -7,6 +8,7 @@ self.addEventListener("activate", (e) => {
       .then(() => self.clients.claim())
   );
 });
+
 self.addEventListener("fetch", (e) => {
   const r = e.request;
   if (r.method !== "GET") return;
@@ -22,5 +24,45 @@ self.addEventListener("fetch", (e) => {
           return res;
         })
     )
+  );
+});
+
+self.addEventListener("push", (e) => {
+  let d = {};
+  try { d = e.data.json(); } catch (err) {}
+  e.waitUntil(
+    (async () => {
+      const list = await clients.matchAll({ type: "window", includeUncontrolled: true });
+      const viewing = list.some((c) => {
+        try { return c.visibilityState === "visible" && new URL(c.url).pathname === d.url; } catch (err) { return false; }
+      });
+      if (viewing && d.kind === "chat") return;
+      await self.registration.showNotification(d.title || "Camino de la Palabra", {
+        body: d.body || "",
+        icon: "/icons/192",
+        badge: "/icons/192",
+        tag: d.tag || undefined,
+        renotify: !!d.tag,
+        data: { url: d.url || "/inicio" },
+      });
+    })()
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "/inicio";
+  e.waitUntil(
+    (async () => {
+      const list = await clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const c of list) {
+        if ("focus" in c) {
+          await c.focus();
+          if ("navigate" in c) await c.navigate(url).catch(() => {});
+          return;
+        }
+      }
+      await clients.openWindow(url);
+    })()
   );
 });
