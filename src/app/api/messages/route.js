@@ -7,6 +7,7 @@ import { getUser } from "@/lib/auth";
 import { getBook } from "@/lib/content";
 import { UPLOAD_DIR, EXT, MAX_BYTES } from "@/lib/files";
 import { pushToPartners } from "@/lib/push";
+import { maybeLightStreak } from "@/lib/streak";
 
 export const dynamic = "force-dynamic";
 const bad = (m, s = 400) => NextResponse.json({ error: m }, { status: s });
@@ -40,7 +41,7 @@ export async function GET(req) {
     await p.query(
       `update messages set read_at = now()
         where couple_id = $1 and book = $2 and chapter = $3
-          and user_id <> $4 and kind <> 'system' and read_at is null`,
+          and user_id <> $4 and kind in ('text','image','audio') and read_at is null`,
       [u.couple_id, book, n, u.id]
     );
   }
@@ -110,5 +111,6 @@ export async function POST(req) {
     tag: `chat-${book}-${n}`,
   }).catch(() => {});
 
-  return NextResponse.json({ ok: true });
+  const lit = await maybeLightStreak(u.couple_id, book, n).catch(() => false);
+  return NextResponse.json({ ok: true, lit });
 }

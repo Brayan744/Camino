@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Mic, Square, Image as ImageIcon, Check, CheckCheck } from "lucide-react";
 import AudioPlayer from "./AudioPlayer";
+import Flame from "./Flame";
 
 export default function Chat({ book, chapter }) {
   const [msgs, setMsgs] = useState([]);
@@ -11,7 +12,9 @@ export default function Chat({ book, chapter }) {
   const [secs, setSecs] = useState(0);
   const [error, setError] = useState("");
   const [readUpTo, setReadUpTo] = useState(0);
+  const [party, setParty] = useState(null);
   const lastId = useRef(0);
+  const first = useRef(true);
   const box = useRef(null);
   const recorder = useRef(null);
   const chunks = useRef([]);
@@ -31,11 +34,19 @@ export default function Chat({ book, chapter }) {
       setReadUpTo(d.readUpTo || 0);
       if (d.messages.length) {
         lastId.current = d.messages[d.messages.length - 1].id;
+        if (!first.current) {
+          const s = d.messages.find((x) => x.kind === "streak");
+          if (s) {
+            setParty(s.body.replace("🔥 ¡Racha encendida! ", ""));
+            setTimeout(() => setParty(null), 4200);
+          }
+        }
         setMsgs((m) => {
           const ids = new Set(m.map((x) => x.id));
           return [...m, ...d.messages.filter((x) => !ids.has(x.id))];
         });
       }
+      first.current = false;
     } catch (e) {}
   }
 
@@ -113,7 +124,30 @@ export default function Chat({ book, chapter }) {
   const mmss = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
 
   return (
-    <div className="card flex h-full flex-col overflow-hidden">
+    <div className="card relative flex h-full flex-col overflow-hidden">
+      {party && (
+        <div
+          onClick={() => setParty(null)}
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center"
+          style={{ background: "color-mix(in srgb, var(--bg) 85%, transparent)", backdropFilter: "blur(3px)" }}
+        >
+          {Array.from({ length: 14 }, (_, i) => (
+            <span
+              key={i}
+              className="pointer-events-none absolute bottom-10 text-2xl"
+              style={{ left: `${(i * 15 + 5) % 92}%`, animation: `floatUp 2.8s ease-out ${i * 0.1}s both` }}
+            >
+              {["🔥", "✨", "🎉", "⭐"][i % 4]}
+            </span>
+          ))}
+          <div style={{ animation: "celebrate .8s ease both" }}>
+            <Flame size={130} a="#f97316" b="#fde047" id="flameParty" />
+          </div>
+          <p className="heading mt-3 text-3xl font-semibold" style={{ animation: "riseIn .6s ease .3s both" }}>¡Racha encendida!</p>
+          <p className="mt-1 text-sm text-muted" style={{ animation: "riseIn .6s ease .5s both" }}>Llevan {party}</p>
+        </div>
+      )}
+
       <div ref={box} className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain p-4" style={{ background: "color-mix(in srgb, var(--line) 25%, transparent)" }}>
         {msgs.length === 0 && (
           <p className="pt-16 text-center text-sm text-muted">Aún no hay mensajes. Escribe lo primero que te llamó la atención.</p>
@@ -122,6 +156,16 @@ export default function Chat({ book, chapter }) {
           m.kind === "system" ? (
             <div key={m.id} className="text-center">
               <span className="rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted">{m.body}</span>
+            </div>
+          ) : m.kind === "streak" ? (
+            <div key={m.id} className="flex justify-center py-1" style={{ animation: "riseIn .6s ease both" }}>
+              <div
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-soft"
+                style={{ background: "linear-gradient(135deg,#f97316,#ec4899)" }}
+              >
+                <Flame size={36} a="#ffffff" b="#fde68a" id={`fs${m.id}`} />
+                <span>{m.body.replace("🔥 ", "")}</span>
+              </div>
             </div>
           ) : (
             <div key={m.id} className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>

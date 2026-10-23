@@ -3,6 +3,7 @@
 export default {
   1: {
     title: "La creación",
+    extra: "creation",
     intro: "Dios habla y el caos se ordena. Fíjense en el ritmo de los seis días y en lo que se repite: Dios ve que lo que hizo es bueno. La cima del capítulo es la creación del ser humano, hecho a imagen de Dios.",
     verse: { ref: "Génesis 1:1", text: "En el principio creó Dios los cielos y la tierra." },
   },

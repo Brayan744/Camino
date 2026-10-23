@@ -8,6 +8,12 @@ export default function ChapterTabs({ book, chapter, backHref, backLabel, eyebro
   const [tab, setTab] = useState(initial);
 
   useEffect(() => {
+    const open = () => setTab("chat");
+    window.addEventListener("open-chat", open);
+    return () => window.removeEventListener("open-chat", open);
+  }, []);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     if (tab !== "chat") return;
     const prev = document.body.style.overflow;
@@ -40,7 +46,7 @@ export default function ChapterTabs({ book, chapter, backHref, backLabel, eyebro
     return (
       <div className="space-y-2">
         <p className="truncate text-sm text-muted">
-          {eyebrow} · <span className="text-ink">{title}</span>
+          {backLabel} · <span className="font-semibold text-ink">Cap. {chapter}</span> · {title}
         </p>
         {tabs}
         <div style={{ height: "calc(100dvh - 18rem)", minHeight: "18rem" }}>
@@ -54,8 +60,19 @@ export default function ChapterTabs({ book, chapter, backHref, backLabel, eyebro
     <div className="space-y-5">
       <div>
         <Link href={backHref} className="text-sm text-muted">← {backLabel}</Link>
-        <p className="eyebrow mt-3">{eyebrow}</p>
-        <h1 className="heading text-3xl font-semibold">{title}</h1>
+        <div className="mt-3 flex items-center gap-4">
+          <div
+            className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl text-bg shadow-soft"
+            style={{ background: "linear-gradient(135deg, var(--brand), var(--accent))" }}
+          >
+            <span className="text-[9px] font-medium uppercase tracking-widest opacity-80">Cap.</span>
+            <span className="heading text-2xl font-semibold leading-none text-bg">{chapter}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="eyebrow">{eyebrow}</p>
+            <h1 className="heading text-3xl font-semibold leading-tight">{title}</h1>
+          </div>
+        </div>
       </div>
       {tabs}
       {children}

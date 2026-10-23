@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, ShieldCheck, Check, X } from "lucide-react";
+import { Shield, ShieldCheck, Check, X, BookOpen, MessageCircle } from "lucide-react";
+import Flame from "./Flame";
 
 const TIERS = [
   { min: 100, a: "#f59e0b", b: "#fde047", name: "Llama dorada" },
@@ -17,7 +18,7 @@ const SAVER = "#38bdf8";
 const dias = (n) => (n === 1 ? "día" : "días");
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export default function StreakCard({ count, best, todayDone, rescue, week, savers }) {
+export default function StreakCard({ count, best, todayDone, rescue, week, savers, today }) {
   const router = useRouter();
   const tier = TIERS.find((t) => count >= t.min);
   const next = MILESTONES.find((m) => m > count);
@@ -46,10 +47,8 @@ export default function StreakCard({ count, best, todayDone, rescue, week, saver
   const base = party
     ? `¡Llegaron a ${count} ${dias(count)} seguidos! 🎉`
     : todayDone
-    ? "¡Hoy ya sumaron! Vuelvan mañana para seguir creciendo."
-    : count > 0
-    ? "Lean hoy un capítulo para mantener la llama viva."
-    : "Lean un capítulo hoy y enciendan su racha.";
+    ? "¡Racha encendida hoy! Vuelvan mañana para seguir creciendo."
+    : "Para encender la racha de hoy, los dos deben leer un capítulo y escribir en su chat.";
   const message = showNext && next ? `Faltan ${next - count} ${dias(next - count)} para llegar a ${next}.` : base;
 
   function poke() {
@@ -78,23 +77,29 @@ export default function StreakCard({ count, best, todayDone, rescue, week, saver
     const f = cap(sel.full);
     if (sel.state === "read") detail = `${f}: ${sel.who.length === 1 ? "leyó " + sel.who[0] : "leyeron " + sel.who.join(" y ")}.`;
     else if (sel.state === "saved") detail = `${f}: salvado con el salvarracha de ${sel.savedBy} 🛡️`;
-    else if (sel.state === "today") detail = "Hoy: aún no han leído.";
-    else if (sel.state === "missed") detail = `${f}: ese día no hubo lectura.`;
+    else if (sel.state === "today") detail = "Hoy: aún falta completar la racha.";
+    else if (sel.state === "missed") detail = `${f}: ese día no se completó la racha.`;
     else detail = `${f}: todavía no habían empezado.`;
   }
+
+  const Step = ({ ok, icon, label }) => (
+    <span
+      className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+      style={
+        ok
+          ? { background: `linear-gradient(135deg, ${tier.a}, ${tier.b})`, color: "#fff" }
+          : { border: "1px solid var(--line)", color: "var(--muted)" }
+      }
+    >
+      {ok ? <Check size={13} /> : icon} {label}
+    </span>
+  );
 
   return (
     <div
       className="relative overflow-hidden rounded-xl2 border p-5 shadow-soft"
       style={{ borderColor: tier.a + "55", background: `linear-gradient(135deg, ${tier.a}22, var(--surface) 70%)` }}
     >
-      <style>{`
-        @keyframes flame { 0%,100% { transform: scale(1) rotate(-1.5deg) } 50% { transform: scale(1.06,1.12) rotate(1.5deg) } }
-        @keyframes pop { 0% { transform: scale(1) } 40% { transform: scale(1.3) rotate(-6deg) } 100% { transform: scale(1) } }
-        @keyframes floatUp { 0% { transform: translateY(0) scale(.6); opacity: 0 } 15% { opacity: 1 } 100% { transform: translateY(-190px) scale(1.2); opacity: 0 } }
-        @keyframes pulseRing { 0%,100% { opacity: .55 } 50% { opacity: 1 } }
-      `}</style>
-
       {party &&
         Array.from({ length: 16 }, (_, i) => (
           <span
@@ -108,25 +113,7 @@ export default function StreakCard({ count, best, todayDone, rescue, week, saver
 
       <div className="flex items-center gap-4">
         <button onClick={poke} aria-label="Ver mensaje de la racha" className="shrink-0" style={{ animation: pop ? "pop .45s ease" : "none" }}>
-          <svg
-            width="84"
-            height="84"
-            viewBox="0 0 64 64"
-            style={{
-              animation: count > 0 ? "flame 1.7s ease-in-out infinite" : "none",
-              transformOrigin: "50% 90%",
-              filter: count > 0 ? `drop-shadow(0 0 14px ${tier.a}99)` : "none",
-            }}
-          >
-            <defs>
-              <linearGradient id="flameGrad" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stopColor={tier.a} />
-                <stop offset="100%" stopColor={tier.b} />
-              </linearGradient>
-            </defs>
-            <path d="M32 3c2 10 13 16 13 31a13 13 0 0 1-26 0c0-6 3-10 5-13 1 4 3 6 5 6 0-8-2-14 3-24z" fill="url(#flameGrad)" />
-            <path d="M32 30c1 5 6 8 6 14a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 0-10z" fill="#fff" opacity=".55" />
-          </svg>
+          <Flame size={84} a={tier.a} b={tier.b} lit={todayDone && count > 0} id="flameMain" />
         </button>
 
         <div className="min-w-0 flex-1">
@@ -135,13 +122,32 @@ export default function StreakCard({ count, best, todayDone, rescue, week, saver
             <span className="text-sm text-muted">{count === 1 ? "día seguido" : "días seguidos"}</span>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full px-2.5 py-1 font-medium text-white" style={{ background: `linear-gradient(135deg, ${tier.a}, ${tier.b})` }}>{tier.name}</span>
+            <span className="rounded-full px-2.5 py-1 font-medium text-white" style={{ background: `linear-gradient(135deg, ${tier.a}, ${tier.b})` }}>
+              {todayDone ? tier.name : "Esperando hoy"}
+            </span>
             <span className="text-muted">Mejor: {best} {dias(best)}</span>
           </div>
         </div>
       </div>
 
       <p className="mt-4 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>{message}</p>
+
+      {!todayDone && (
+        <div className="mt-3 rounded-xl border border-line p-3" style={{ background: "var(--surface)" }}>
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted">Para encender hoy</p>
+          <div className="space-y-2">
+            {today.map((m) => (
+              <div key={m.id} className="flex items-center justify-between gap-2 text-sm">
+                <span className="font-medium">{m.mine ? "Tú" : m.name}</span>
+                <span className="flex items-center gap-1.5">
+                  <Step ok={m.marked} icon={<BookOpen size={13} />} label="Leyó" />
+                  <Step ok={m.wrote} icon={<MessageCircle size={13} />} label="Escribió" />
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {next && (
         <div className="mt-3">
@@ -180,7 +186,7 @@ export default function StreakCard({ count, best, todayDone, rescue, week, saver
       {rescue && (
         <div className="mt-5 rounded-xl p-4" style={{ border: `1px solid ${SAVER}`, background: SAVER + "1a" }}>
           <p className="flex items-center gap-2 text-sm font-semibold"><ShieldCheck size={18} style={{ color: SAVER }} /> ¡Su racha está en peligro!</p>
-          <p className="mt-1 text-sm text-muted">Ayer no leyeron. Pueden salvar su racha de {rescue.lost} {dias(rescue.lost)} con un salvarracha.</p>
+          <p className="mt-1 text-sm text-muted">Ayer no la completaron. Pueden salvar su racha de {rescue.lost} {dias(rescue.lost)} con un salvarracha.</p>
           {me && me.left > 0 ? (
             <button onClick={rescueIt} disabled={busy} className="btn-primary mt-3 w-full">{busy ? "Un momento…" : "Usar mi salvarracha 🛡️"}</button>
           ) : (

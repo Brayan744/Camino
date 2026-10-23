@@ -15,5 +15,6 @@ export function getChapter(slug, n) {
     verse: c?.verse || null,
     image: c?.image || null,
     terms: c?.terms || [],
+    extra: c?.extra || null,
   };
 }

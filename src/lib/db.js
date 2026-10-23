@@ -58,6 +58,24 @@ CREATE TABLE IF NOT EXISTS reminders_log (
   kind TEXT NOT NULL,
   PRIMARY KEY (user_id, day, kind)
 );
+CREATE TABLE IF NOT EXISTS reads (
+  couple_id INT REFERENCES couples(id) ON DELETE CASCADE,
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  book TEXT NOT NULL,
+  chapter INT NOT NULL,
+  done_at TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (user_id, book, chapter)
+);
+CREATE TABLE IF NOT EXISTS streak_days (
+  couple_id INT REFERENCES couples(id) ON DELETE CASCADE,
+  day TEXT NOT NULL,
+  PRIMARY KEY (couple_id, day)
+);
+INSERT INTO reads (couple_id, user_id, book, chapter, done_at)
+SELECT p.couple_id, u.id, p.book, p.chapter, p.done_at
+  FROM progress p JOIN users u ON u.couple_id = p.couple_id
+ WHERE NOT EXISTS (SELECT 1 FROM reads)
+ON CONFLICT DO NOTHING;
 `;
 
 const g = globalThis;

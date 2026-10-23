@@ -1,4 +1,4 @@
-const CACHE = "camino-v3";
+const CACHE = "camino-v4";
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => {
@@ -40,7 +40,7 @@ self.addEventListener("push", (e) => {
       await self.registration.showNotification(d.title || "Camino de la Palabra", {
         body: d.body || "",
         icon: "/icons/192",
-        badge: "/icons/192",
+        badge: "/icons/badge",
         tag: d.tag || undefined,
         renotify: !!d.tag,
         data: { url: (d.url || "/inicio") + (d.kind === "chat" ? "?tab=chat" : "") },

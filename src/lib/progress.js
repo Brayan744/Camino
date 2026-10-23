@@ -23,16 +23,28 @@ export function bookStates(rows) {
   });
 }
 
-const day = (d) => new Date(d).toLocaleDateString("en-CA", { timeZone: "America/Bogota" });
+export async function loadReads(coupleId) {
+  const p = await db();
+  const r = await p.query("select user_id, book, chapter from reads where couple_id = $1", [coupleId]);
+  return r.rows;
+}
 
-export function streak(rows) {
-  const days = new Set(rows.map((r) => day(r.done_at)));
-  let cur = new Date();
-  if (!days.has(day(cur))) cur = new Date(cur.getTime() - 864e5);
-  let n = 0;
-  while (days.has(day(cur))) {
-    n++;
-    cur = new Date(cur.getTime() - 864e5);
-  }
-  return n;
+export async function chapterReaders(coupleId, book, chapter) {
+  const p = await db();
+  const r = await p.query(
+    "select user_id from reads where couple_id = $1 and book = $2 and chapter = $3",
+    [coupleId, book, chapter]
+  );
+  return new Set(r.rows.map((x) => x.user_id));
+}
+
+export async function loadUnread(coupleId, userId) {
+  const p = await db();
+  const r = await p.query(
+    `select book, chapter, count(*)::int as n from messages
+      where couple_id = $1 and user_id <> $2 and kind in ('text','image','audio') and read_at is null
+      group by book, chapter`,
+    [coupleId, userId]
+  );
+  return r.rows;
 }

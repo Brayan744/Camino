@@ -3,9 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import { ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
 import { getUser } from "@/lib/auth";
 import { getBook, getChapter } from "@/lib/content";
-import { loadProgress, bookStates } from "@/lib/progress";
+import { loadProgress, bookStates, chapterReaders } from "@/lib/progress";
+import { loadStreak } from "@/lib/streak";
 import ReadButton from "@/components/ReadButton";
 import ChapterTabs from "@/components/ChapterTabs";
+import CreationDays from "@/components/CreationDays";
 
 export default async function Capitulo({ params, searchParams }) {
   const u = await getUser();
@@ -13,13 +15,18 @@ export default async function Capitulo({ params, searchParams }) {
   const n = parseInt(params.n, 10);
   if (!book || !(n >= 1 && n <= book.chapters)) notFound();
 
-  const rows = await loadProgress(u.couple_id);
+  const [rows, st2, readers] = await Promise.all([
+    loadProgress(u.couple_id),
+    loadStreak(u.couple_id, u.id),
+    chapterReaders(u.couple_id, book.slug, n),
+  ]);
   const st = bookStates(rows).find((b) => b.slug === book.slug);
   if (!st.unlocked) redirect("/inicio");
 
   const doneSet = new Set(rows.filter((r) => r.book === book.slug).map((r) => r.chapter));
   const ch = getChapter(book.slug, n);
-  const isDone = doneSet.has(n);
+  const meToday = st2.today.find((x) => x.mine) || { marked: false, wrote: false };
+  const partnerToday = st2.today.find((x) => !x.mine) || null;
   const lastRead = [...doneSet]
     .filter((c) => c < n)
     .sort((a, b) => b - a)
@@ -43,6 +50,8 @@ export default async function Capitulo({ params, searchParams }) {
       <div className="card p-5">
         <p className="leading-relaxed">{ch.intro}</p>
       </div>
+
+      {ch.extra === "creation" && <CreationDays />}
 
       {ch.terms.length > 0 && (
         <div className="card p-5">
@@ -69,13 +78,21 @@ export default async function Capitulo({ params, searchParams }) {
 
       <div className="card p-5 text-sm text-muted">
         <p>
-          Llevan <span className="font-semibold text-ink">{st.done}</span> de {book.chapters} capítulos de {book.name}.
+          Han completado juntos <span className="font-semibold text-ink">{st.done}</span> de {book.chapters} capítulos de {book.name}.
         </p>
-        {lastRead.length > 0 && <p className="mt-1">Lo último que leyeron: {lastRead.join(" · ")}.</p>}
+        {lastRead.length > 0 && <p className="mt-1">Lo último que terminaron: {lastRead.join(" · ")}.</p>}
       </div>
 
       <p className="text-sm text-muted">Lean {book.name} {n} en su Reina Valera 1960 y vuelvan aquí para marcarlo.</p>
-      <ReadButton book={book.slug} chapter={n} done={isDone} />
+      <ReadButton
+        book={book.slug}
+        chapter={n}
+        done={readers.has(u.id)}
+        meToday={meToday}
+        partnerToday={partnerToday}
+        partnerDone={partnerToday ? readers.has(partnerToday.id) : false}
+        lit={st2.todayDone}
+      />
 
       <div className="flex justify-between pb-14 text-sm">
         {n > 1 ? (

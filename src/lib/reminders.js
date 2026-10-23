@@ -26,49 +26,44 @@ async function tick() {
     const s = await loadStreak(c.id, 0);
     if (!s.savers.length) continue;
 
-    let kind = null;
-    let payload = null;
-    let targets = s.savers;
-
     if (s.rescue) {
-      kind = "rescue";
-      targets = s.savers.filter((x) => x.left > 0);
-      payload = {
+      const payload = {
         kind: "streak",
         title: "🛡️ ¡Su racha está en peligro!",
-        body: `Ayer no leyeron. Usen un salvarracha y conserven sus ${s.rescue.lost} ${dias(s.rescue.lost)}.`,
+        body: `Ayer no cumplieron. Usen un salvarracha y conserven sus ${s.rescue.lost} ${dias(s.rescue.lost)}.`,
         url: "/inicio",
         tag: "streak",
       };
-    } else if (!s.todayDone && s.count > 0 && hour >= 19) {
-      if (hour >= 21) {
-        kind = "late";
-        payload = {
-          kind: "streak",
-          title: `🔥 ¡Últimas horas! Racha de ${s.count} ${dias(s.count)}`,
-          body: "Lean un capítulo antes de que termine el día.",
-          url: "/inicio",
-          tag: "streak",
-        };
-      } else {
-        kind = "eve";
-        payload = {
-          kind: "streak",
-          title: `🔥 Su racha de ${s.count} ${dias(s.count)} los espera`,
-          body: "Aún no han leído hoy. Con un capítulo la mantienen.",
-          url: "/inicio",
-          tag: "streak",
-        };
-      }
+      for (const t of s.savers.filter((x) => x.left > 0)) await send(p, t.id, today, "rescue", payload);
+      continue;
     }
-    if (!kind) continue;
 
-    for (const t of targets) {
-      const ins = await p.query(
-        "insert into reminders_log(user_id, day, kind) values($1,$2,$3) on conflict do nothing returning 1",
-        [t.id, today, kind]
-      );
-      if (ins.rowCount) await pushToUsers([t.id], payload);
+    if (s.todayDone || s.count === 0 || hour < 19) continue;
+    const late = hour >= 21;
+    const kind = late ? "late" : "eve";
+
+    for (const t of s.today) {
+      if (t.marked && t.wrote) continue;
+      const need = !t.marked
+        ? "Aún no marcas tu capítulo de hoy."
+        : "Ya leíste, pero falta escribir en el chat del capítulo.";
+      await send(p, t.id, today, kind, {
+        kind: "streak",
+        title: late
+          ? `🔥 ¡Últimas horas! Racha de ${s.count} ${dias(s.count)}`
+          : `🔥 Su racha de ${s.count} ${dias(s.count)} los espera`,
+        body: need,
+        url: "/inicio",
+        tag: "streak",
+      });
     }
   }
+}
+
+async function send(p, userId, day, kind, payload) {
+  const ins = await p.query(
+    "insert into reminders_log(user_id, day, kind) values($1,$2,$3) on conflict do nothing returning 1",
+    [userId, day, kind]
+  );
+  if (ins.rowCount) await pushToUsers([userId], payload);
 }

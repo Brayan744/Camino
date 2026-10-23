@@ -11,7 +11,10 @@ export default async function AppLayout({ children }) {
     <div className="min-h-screen pb-24">
       <header className="sticky top-0 z-10 border-b border-line bg-bg">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-          <Link href="/inicio" className="heading text-xl font-semibold">Camino de la Palabra</Link>
+          <Link href="/inicio" className="flex items-center gap-2.5">
+            <img src="/icons/96" width={30} height={30} alt="" className="rounded-lg" />
+            <span className="heading text-xl font-semibold">Camino de la Palabra</span>
+          </Link>
           <HeaderActions />
         </div>
       </header>
