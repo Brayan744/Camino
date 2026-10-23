@@ -103,13 +103,13 @@ export async function POST(req) {
     : kind === "image"
     ? "📷 Foto"
     : "🎤 Nota de voz";
-  pushToPartners(u.couple_id, u.id, {
+  await pushToPartners(u.couple_id, u.id, {
     kind: "chat",
     title: `${u.name} · ${b.name} ${n}`,
     body,
     url: `/libro/${book}/${n}`,
     tag: `chat-${book}-${n}`,
-  }).catch(() => {});
+  }).catch((e) => console.error("push chat:", e.message));
 
   const lit = await maybeLightStreak(u.couple_id, book, n).catch(() => false);
   return NextResponse.json({ ok: true, lit });
