@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
 import { getBook, getChapter } from "@/lib/content";
 import { loadProgress, bookStates } from "@/lib/progress";
+import BookRecap from "@/components/BookRecap";
 
 const fmt = (d) => new Date(d).toLocaleDateString("es", { day: "numeric", month: "long", timeZone: "America/Bogota" });
 
@@ -20,7 +21,7 @@ export default async function Repaso({ params }) {
   const nextBook = states[idx + 1];
 
   return (
-    <div className="space-y-6">
+    <div className="stagger space-y-6">
       <div>
         <p className="eyebrow">Repaso</p>
         <h1 className="heading text-3xl font-semibold">{book.emoji} {book.name}</h1>
@@ -28,6 +29,8 @@ export default async function Repaso({ params }) {
           Leyeron los {book.chapters} capítulos entre el {fmt(first)} y el {fmt(last)}. {book.intro}
         </p>
       </div>
+
+      <BookRecap slug={book.slug} />
 
       <div className="space-y-3">
         {Array.from({ length: book.chapters }, (_, i) => i + 1).map((n) => {

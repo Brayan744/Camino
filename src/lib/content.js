@@ -1,6 +1,13 @@
 import { BOOKS } from "@/data/books";
 import { CHAPTERS } from "@/data/chapters";
 
+// Animaciones didácticas por capítulo
+const EXTRAS = {
+  genesis: { 1: "creation", 7: "flood" },
+  exodo: { 7: "plagues", 14: "redsea", 26: "tabernacle" },
+  numeros: { 2: "camp" },
+};
+
 export const getBook = (slug) => BOOKS.find((b) => b.slug === slug);
 
 export function getChapter(slug, n) {
@@ -15,6 +22,7 @@ export function getChapter(slug, n) {
     verse: c?.verse || null,
     image: c?.image || null,
     terms: c?.terms || [],
-    extra: c?.extra || null,
+    extra: c?.extra || EXTRAS[slug]?.[n] || null,
+    summary: c?.summary || [],
   };
 }

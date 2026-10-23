@@ -58,6 +58,7 @@ export default {
   },
   7: {
     title: "La vara y la primera plaga",
+    extra: "plagues",
     intro: "Empieza el duelo entre Dios y Faraón. La vara de Aarón se vuelve serpiente y los magos egipcios imitan la señal, pero la serpiente de Aarón se traga a las demás. Después el Nilo se convierte en sangre. Cada plaga golpea algo que los egipcios consideraban divino.",
     terms: [
       ["Las plagas", "Diez golpes sobre Egipto. No son castigos al azar: cada una desafía a un dios o a un símbolo egipcio, empezando por el Nilo, fuente de vida del país."],
@@ -115,6 +116,7 @@ export default {
   },
   14: {
     title: "El mar Rojo",
+    extra: "redsea",
     intro: "Israel queda atrapado entre el ejército de Faraón y el mar. Lo que parece el final es el escenario de la liberación más grande del Antiguo Testamento. Fíjense en el miedo del pueblo y en la calma de Moisés.",
     terms: [
       ["Mar Rojo", "En hebreo se llama «mar de los Juncos». Los estudiosos discuten su ubicación exacta, pero el texto subraya que Dios abrió un camino donde no lo había."],
@@ -223,6 +225,7 @@ export default {
   },
   26: {
     title: "La estructura del tabernáculo",
+    extra: "tabernacle",
     intro: "ee detallan cortinas, tablones y velo. Presten atención a la división interna: un espacio llamado Lugar eanto y, tras un velo, el Lugar eantísimo. Es una forma de enseñar que acercarse a Dios no es algo que se hace a la ligera.",
     terms: [
       ["Lugar eantísimo", "El cuarto interior, donde estaba el arca. eolo el sumo sacerdote entraba una vez al año."],

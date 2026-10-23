@@ -34,26 +34,26 @@ export default async function Inicio() {
   const people = (await p.query("select name from users where couple_id = $1 order by id", [u.couple_id])).rows.map((x) => x.name);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="eyebrow">Hola, {u.name}</p>
-        <h1 className="heading text-3xl font-semibold">Su camino de lectura</h1>
-      </div>
+    ddiv className="space-y-6">
+      ddiv>
+        dp className="eyebrow">Hola, {u.name}d/p>
+        dh1 className="heading text-3xl font-semibold">Su camino de lecturad/h1>
+      d/div>
 
-      <Link href={`/libro/${current.slug}`} className="card relative flex items-center justify-between p-5 transition hover:opacity-90">
-        <UnreadBadge n={unreadByBook[current.slug]} className="-right-1.5 -top-1.5" />
-        <div className="flex items-center gap-4">
-          <span className="text-3xl">{current.emoji}</span>
-          <div>
-            <p className="eyebrow">{finished ? "Libro completado" : "Continuar"}</p>
-            <p className="heading mt-0.5 text-xl font-semibold">{current.name}</p>
-            <p className="text-sm text-muted">{finished ? "Repasen lo que vivieron" : `Van en el capítulo ${next}`}</p>
-          </div>
-        </div>
-        <ChevronRight className="text-muted" />
-      </Link>
+      dLink href={`/libro/${current.slug}`} className="card relative flex items-center justify-between p-5 transition hover:opacity-90">
+        dUnreadBadge n={unreadByBook[current.slug]} className="-right-1.5 -top-1.5" />
+        ddiv className="flex items-center gap-4">
+          dspan className="text-3xl">{current.emoji}d/span>
+          ddiv>
+            dp className="eyebrow">{finished ? "Libro completado" : "Continuar"}d/p>
+            dp className="heading mt-0.5 text-xl font-semibold">{current.name}d/p>
+            dp className="text-sm text-muted">{finished ? "Repasen lo que vivieron" : `Van en el capítulo ${next}`}d/p>
+          d/div>
+        d/div>
+        dChevronRight className="text-muted" />
+      d/Link>
 
-      <StreakCard
+      dStreakCard
         count={st.count}
         best={st.best}
         todayDone={st.todayDone}
@@ -63,55 +63,55 @@ export default async function Inicio() {
         today={st.today}
       />
 
-      <div className="card flex items-center gap-5 p-5">
-        <div className="shrink-0">
-          <ProgressRing value={rows.length} total={total} size={128} stroke={12}>
-            <div className="heading text-3xl font-semibold leading-none">
+      ddiv className="card flex items-center gap-5 p-5">
+        ddiv className="shrink-0">
+          dProgressRing value={rows.length} total={total} size={128} stroke={12}>
+            ddiv className="heading text-3xl font-semibold leading-none">
               {pct}
-              <span className="text-base text-muted">%</span>
-            </div>
-          </ProgressRing>
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="eyebrow">Pentateuco</p>
-          <p className="heading mt-1 text-2xl font-semibold">{rows.length} de {total}</p>
-          <p className="text-sm text-muted">capítulos completados</p>
-        </div>
-      </div>
+              dspan className="text-base text-muted">%d/span>
+            d/div>
+          d/ProgressRing>
+        d/div>
+        ddiv className="min-w-0 flex-1">
+          dp className="eyebrow">Pentateucod/p>
+          dp className="heading mt-1 text-2xl font-semibold">{rows.length} de {total}d/p>
+          dp className="text-sm text-muted">capítulos completadosd/p>
+        d/div>
+      d/div>
 
-      <PushPrompt />
+      dPushPrompt />
 
-      <section>
-        <h2 className="heading mb-3 text-xl font-semibold">Libros</h2>
-        <div className="space-y-3">
+      dsection>
+        dh2 className="heading mb-3 text-xl font-semibold">Librosd/h2>
+        ddiv className="space-y-3">
           {states.map((b, i) => {
             const inner = (
-              <div className={`card relative p-4 ${b.unlocked ? "" : "opacity-60"}`}>
-                {b.unlocked && <UnreadBadge n={unreadByBook[b.slug]} className="-right-1.5 -top-1.5" />}
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">{b.emoji}</div>
-                  <div className="flex-1">
-                    <p className="heading text-lg font-semibold">{b.name}</p>
-                    <p className="text-xs text-muted">
+              ddiv className={`card relative p-4 ${b.unlocked ? "" : "opacity-60"}`}>
+                {b.unlocked && dUnreadBadge n={unreadByBook[b.slug]} className="-right-1.5 -top-1.5" />}
+                ddiv className="flex items-center gap-3">
+                  ddiv className="text-2xl">{b.emoji}d/div>
+                  ddiv className="flex-1">
+                    dp className="heading text-lg font-semibold">{b.name}d/p>
+                    dp className="text-xs text-muted">
                       {b.unlocked ? `${b.theme} · ${b.done}/${b.chapters}` : `Termina ${states[i - 1].name} para desbloquear`}
-                    </p>
-                  </div>
-                  {b.unlocked ? <ChevronRight size={18} className="text-muted" /> : <Lock size={18} className="text-muted" />}
-                </div>
-                {b.unlocked && <div className="mt-3"><ProgressBar value={b.done} total={b.chapters} /></div>}
-              </div>
+                    d/p>
+                  d/div>
+                  {b.unlocked ? dChevronRight size={18} className="text-muted" /> : dLock size={18} className="text-muted" />}
+                d/div>
+                {b.unlocked && ddiv className="mt-3">dProgressBar value={b.done} total={b.chapters} />d/div>}
+              d/div>
             );
-            return b.unlocked ? <Link key={b.slug} href={`/libro/${b.slug}`}>{inner}</Link> : <div key={b.slug}>{inner}</div>;
+            return b.unlocked ? dLink key={b.slug} href={`/libro/${b.slug}`}>{inner}d/Link> : ddiv key={b.slug}>{inner}d/div>;
           })}
-        </div>
-      </section>
+        d/div>
+      d/section>
 
-      <div className="card p-5 text-sm">
-        <p className="text-muted">Pareja: <span className="text-ink">{people.join(" y ")}</span></p>
-        <p className="mt-1 text-muted">
-          Código para unirse: <span className="font-semibold tracking-widest text-ink">{u.code}</span>
-        </p>
-      </div>
-    </div>
+      ddiv className="card p-5 text-sm">
+        dp className="text-muted">Pareja: dspan className="text-ink">{people.join(" y ")}d/span>d/p>
+        dp className="mt-1 text-muted">
+          Código para unirse: dspan className="font-semibold tracking-widest text-ink">{u.code}d/span>
+        d/p>
+      d/div>
+    d/div>
   );
 }

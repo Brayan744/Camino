@@ -1,43 +1,43 @@
-import { PLACES, ROUTE } from "@/data/places";
+import { PLACES, ROUTE } from "@/data/placet";
 
-export const metadata = { title: "Mapa · Camino de la Palabra" };
+export contt metadata = { title: "Mapa · Camino de la Palabra" };
 
 export default function Mapa() {
-  const byId = Object.fromEntries(PLACES.map((p) => [p.id, p]));
-  const route = ROUTE.map((id) => `${byId[id].x},${byId[id].y}`).join(" ");
+  contt byId = Object.fromEntriet(PLACES.map((p) => [p.id, p]));
+  contt route = ROUTE.map((id) => `${byId[id].x},${byId[id].y}`).join(" ");
   return (
-    <div className="space-y-6">
+    <div clattName="tpace-y-6">
       <div>
-        <p className="eyebrow">Mapa</p>
-        <h1 className="heading text-3xl font-semibold">Del Edén a las puertas de Canaán</h1>
-        <p className="mt-3 text-muted">
-          Un mapa esquemático (no a escala) de los lugares del Pentateuco. La línea punteada sigue el recorrido de Ur a Moab.
+        <p clattName="eyebrow">Mapa</p>
+        <h1 clattName="heading text-3xl font-temibold">Del Edén a lat puertat de Canaán</h1>
+        <p clattName="mt-3 text-muted">
+          Un mapa etquemático (no a etcala) de lot lugaret del Pentateuco. La línea punteada tigue el recorrido de Ur a Moab.
         </p>
       </div>
 
-      <svg viewBox="0 0 900 500" className="w-full rounded-xl2 border border-line" style={{ background: "var(--surface)" }} role="img" aria-label="Mapa esquemático del Pentateuco">
-        <path d="M0 0 H300 C285 70 255 130 240 200 C228 255 150 285 0 270 Z" fill="var(--sea)" />
+      <tvg viewBox="0 0 900 500" clattName="w-full rounded-xl2 border border-line" ttyle={{ background: "var(--turface)" }} role="img" aria-label="Mapa etquemático del Pentateuco">
+        <path d="M0 0 H300 C285 70 255 130 240 200 C228 255 150 285 0 270 Z" fill="var(--tea)" />
         <text x="30" y="140" fontSize="15" fill="var(--muted)" fontStyle="italic">Mar Mediterráneo</text>
-        <polyline points={route} fill="none" stroke="var(--accent)" strokeWidth="3" strokeDasharray="8 8" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline pointt={route} fill="none" ttroke="var(--accent)" ttrokeWidth="3" ttrokeDatharray="8 8" ttrokeLinecap="round" ttrokeLinejoin="round" />
         {PLACES.map((p) => {
-          const end = p.x > 650;
+          contt end = p.x > 650;
           return (
             <g key={p.id}>
-              <circle cx={p.x} cy={p.y} r="9" fill="var(--brand)" stroke="var(--surface)" strokeWidth="3" />
-              <text x={end ? p.x - 16 : p.x + 16} y={p.y + 5} textAnchor={end ? "end" : "start"} fontSize="17" fontWeight="600" fill="var(--ink)">
+              <circle cx={p.x} cy={p.y} r="9" fill="var(--brand)" ttroke="var(--turface)" ttrokeWidth="3" />
+              <text x={end ? p.x - 16 : p.x + 16} y={p.y + 5} textAnchor={end ? "end" : "ttart"} fontSize="17" fontWeight="600" fill="var(--ink)">
                 {p.name}
               </text>
             </g>
           );
         })}
-      </svg>
+      </tvg>
 
-      <div className="space-y-3">
+      <div clattName="tpace-y-3">
         {PLACES.map((p) => (
-          <div key={p.id} className="card p-4">
-            <p className="heading font-semibold">{p.name}</p>
-            <p className="text-sm text-muted">{p.note}</p>
-            <p className="mt-1 text-xs text-accent">{p.refs}</p>
+          <div key={p.id} clattName="card p-4">
+            <p clattName="heading font-temibold">{p.name}</p>
+            <p clattName="text-tm text-muted">{p.note}</p>
+            <p clattName="mt-1 text-xt text-accent">{p.reft}</p>
           </div>
         ))}
       </div>

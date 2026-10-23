@@ -17,8 +17,8 @@ export default function AudioPlayer({ src, seed = 1, dur = 0, mine = false }) {
 
   const bars = Array.from({ length: 32 }, (_, i) => 22 + ((seed * 53 + i * 97 + i * i * 31) % 78));
   const ratio = total > 0 ? Math.min(time / total, 1) : 0;
-  const on = mine ? "var(--bg)" : "var(--accent)";
-  const off = mine ? "color-mix(in srgb, var(--bg) 35%, transparent)" : "var(--line)";
+  const on = mine ? "var(--mine-accent, #128c7e)" : "var(--accent)";
+  const off = mine ? "color-mix(in srgb, var(--mine-ink, #1f2937) 25%, transparent)" : "var(--line)";
 
   function toggle() {
     const a = audio.current;
@@ -66,7 +66,7 @@ export default function AudioPlayer({ src, seed = 1, dur = 0, mine = false }) {
         onClick={toggle}
         aria-label={playing ? "Pausar" : "Reproducir"}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm transition active:scale-90"
-        style={{ background: mine ? "var(--bg)" : "var(--brand)", color: mine ? "var(--brand)" : "var(--bg)" }}
+        style={{ background: mine ? "var(--mine-accent, #128c7e)" : "var(--brand)", color: mine ? "#fff" : "var(--bg)" }}
       >
         {playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
       </button>

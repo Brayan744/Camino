@@ -7,7 +7,7 @@ import { loadProgress, bookStates, chapterReaders } from "@/lib/progress";
 import { loadStreak } from "@/lib/streak";
 import ReadButton from "@/components/ReadButton";
 import ChapterTabs from "@/components/ChapterTabs";
-import CreationDays from "@/components/CreationDays";
+import Extra from "@/components/Extra";
 
 export default async function Capitulo({ params, searchParams }) {
   const u = await getUser();
@@ -51,7 +51,21 @@ export default async function Capitulo({ params, searchParams }) {
         <p className="leading-relaxed">{ch.intro}</p>
       </div>
 
-      {ch.extra === "creation" && <CreationDays />}
+      {ch.summary.length > 0 && (
+        <div className="card p-5">
+          <h2 className="heading mb-3 text-lg font-semibold">✨ En resumen</h2>
+          <ul className="space-y-2.5">
+            {ch.summary.map((s, i) => (
+              <li key={i} className="flex gap-3 text-sm" style={{ animation: `riseIn .5s ease ${0.15 * i}s both` }}>
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-bg" style={{ background: "var(--accent)" }}>{i + 1}</span>
+                <span className="leading-relaxed text-muted">{s}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {ch.extra && <Extra kind={ch.extra} />}
 
       {ch.terms.length > 0 && (
         <div className="card p-5">
