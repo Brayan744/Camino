@@ -5,9 +5,11 @@ import { getUser } from "@/lib/auth";
 import { getBook, getChapter } from "@/lib/content";
 import { loadProgress, bookStates, chapterReaders } from "@/lib/progress";
 import { loadStreak } from "@/lib/streak";
+import { dispensationAt, markerAt } from "@/data/dispensations";
 import ReadButton from "@/components/ReadButton";
 import ChapterTabs from "@/components/ChapterTabs";
 import Extra from "@/components/Extra";
+import { DispNote, DispMarker } from "@/components/DispCard";
 
 export default async function Capitulo({ params, searchParams }) {
   const u = await getUser();
@@ -33,6 +35,8 @@ export default async function Capitulo({ params, searchParams }) {
     .slice(0, 3)
     .reverse()
     .map((c) => getChapter(book.slug, c).title);
+  const marker = markerAt(book.slug, n);
+  const dispId = dispensationAt(book.slug, n);
 
   return (
     <ChapterTabs
@@ -45,6 +49,8 @@ export default async function Capitulo({ params, searchParams }) {
       title={ch.title}
       initial={searchParams?.tab === "chat" ? "chat" : "read"}
     >
+      {marker && <DispMarker marker={marker} />}
+
       {ch.image && <img src={ch.image} alt={ch.title} className="w-full rounded-xl2 border border-line" />}
 
       <div className="card p-5">
@@ -64,6 +70,8 @@ export default async function Capitulo({ params, searchParams }) {
           </ul>
         </div>
       )}
+
+      {!marker && <DispNote id={dispId} />}
 
       {ch.extra && <Extra kind={ch.extra} />}
 

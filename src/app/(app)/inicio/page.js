@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { Lock, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { getUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { loadProgress, bookStates, loadUnread } from "@/lib/progress";
 import { loadStreak } from "@/lib/streak";
+import { dispensationAt } from "@/data/dispensations";
 import ProgressRing from "@/components/ProgressRing";
-import ProgressBar from "@/components/ProgressBar";
 import StreakCard from "@/components/StreakCard";
 import PushPrompt from "@/components/PushPrompt";
 import UnreadBadge from "@/components/UnreadBadge";
+import BibleGroups from "@/components/BibleGroups";
+import { DispCard } from "@/components/DispCard";
 
 export default async function Inicio() {
   const u = await getUser();
@@ -29,6 +31,7 @@ export default async function Inicio() {
   let next = 1;
   while (doneSet.has(next)) next++;
   const finished = next > current.chapters;
+  const disp = dispensationAt(current.slug, finished ? current.chapters : next);
 
   const p = await db();
   const people = (await p.query("select name from users where couple_id = $1 order by id", [u.couple_id])).rows.map((x) => x.name);
@@ -73,37 +76,20 @@ export default async function Inicio() {
           </ProgressRing>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="eyebrow">Pentateuco</p>
+          <p className="eyebrow">Libros disponibles</p>
           <p className="heading mt-1 text-2xl font-semibold">{rows.length} de {total}</p>
           <p className="text-sm text-muted">capítulos completados</p>
         </div>
       </div>
 
+      <DispCard id={disp} />
+
       <PushPrompt />
 
       <section>
-        <h2 className="heading mb-3 text-xl font-semibold">Libros</h2>
-        <div className="space-y-3">
-          {states.map((b, i) => {
-            const inner = (
-              <div className={`card relative p-4 ${b.unlocked ? "" : "opacity-60"}`}>
-                {b.unlocked && <UnreadBadge n={unreadByBook[b.slug]} className="-right-1.5 -top-1.5" />}
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">{b.emoji}</div>
-                  <div className="flex-1">
-                    <p className="heading text-lg font-semibold">{b.name}</p>
-                    <p className="text-xs text-muted">
-                      {b.unlocked ? `${b.theme} · ${b.done}/${b.chapters}` : `Termina ${states[i - 1].name} para desbloquear`}
-                    </p>
-                  </div>
-                  {b.unlocked ? <ChevronRight size={18} className="text-muted" /> : <Lock size={18} className="text-muted" />}
-                </div>
-                {b.unlocked && <div className="mt-3"><ProgressBar value={b.done} total={b.chapters} /></div>}
-              </div>
-            );
-            return b.unlocked ? <Link key={b.slug} href={`/libro/${b.slug}`}>{inner}</Link> : <div key={b.slug}>{inner}</div>;
-          })}
-        </div>
+        <h2 className="heading mb-1 text-2xl font-semibold">La Biblia completa</h2>
+        <p className="mb-4 text-sm text-muted">Los 66 libros. Los que aún no están escritos se irán abriendo poco a poco.</p>
+        <BibleGroups states={states} unread={unreadByBook} currentSlug={current.slug} />
       </section>
 
       <div className="card p-5 text-sm">

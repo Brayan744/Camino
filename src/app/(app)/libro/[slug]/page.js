@@ -5,6 +5,7 @@ import { getUser } from "@/lib/auth";
 import BookRecap from "@/components/BookRecap";
 import { getBook, getChapter } from "@/lib/content";
 import { loadProgress, bookStates, loadReads, loadUnread } from "@/lib/progress";
+import { bookRanges, getDisp, DISPENSATIONS } from "@/data/dispensations";
 import ProgressBar from "@/components/ProgressBar";
 import UnreadBadge from "@/components/UnreadBadge";
 
@@ -31,6 +32,7 @@ export default async function Libro({ params }) {
   const hasNext = next <= book.chapters;
   const nextTitle = hasNext ? getChapter(book.slug, next).title : null;
   const nextBook = states[idx + 1];
+  const ranges = bookRanges(book.slug);
 
   return (
     <div className="stagger space-y-6">
@@ -46,6 +48,37 @@ export default async function Libro({ params }) {
           {book.look.map((l) => <li key={l}>{l}</li>)}
         </ul>
       </div>
+
+      {ranges.length > 0 && (
+        <div className="card p-5">
+          <h2 className="heading mb-1 text-lg font-semibold">📍 En qué época de la historia estamos</h2>
+          <p className="mb-3 text-sm text-muted">
+            {ranges.length === 1
+              ? "Todo este libro ocurre dentro de la misma dispensación."
+              : "Este libro atraviesa varias dispensaciones. Verán el cambio de etapa en medio de la lectura."}
+          </p>
+          <div className="space-y-2">
+            {ranges.map((r) => {
+              const d = getDisp(r.id);
+              return (
+                <Link
+                  key={`${r.id}-${r.from}`}
+                  href={`/dispensaciones#${d.id}`}
+                  className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5 transition hover:opacity-90"
+                >
+                  <span className="text-xl">{d.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">{d.name}</p>
+                    <p className="text-xs text-muted">
+                      {r.from === r.to ? `Capítulo ${r.from}` : `Capítulos ${r.from}–${r.to}`} · dispensación {d.n} de {DISPENSATIONS.length}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="mb-2 flex items-baseline justify-between">

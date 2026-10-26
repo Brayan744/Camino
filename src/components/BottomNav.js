@@ -1,13 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Map as MapIcon, Clock, Compass } from "lucide-react";
+import { Home, BookOpen, Map as MapIcon, Clock, Compass, Layers } from "lucide-react";
 
 const ITEMS = [
   { href: "/inicio", label: "Inicio", Icon: Home, match: ["/inicio", "/libro", "/repaso"] },
   { href: "/biblia", label: "Biblia", Icon: BookOpen, match: ["/biblia"] },
   { href: "/mapa", label: "Mapa", Icon: MapIcon, match: ["/mapa"] },
   { href: "/linea-del-tiempo", label: "Tiempo", Icon: Clock, match: ["/linea-del-tiempo"] },
+  { href: "/dispensaciones", label: "Épocas", Icon: Layers, match: ["/dispensaciones"] },
   { href: "/como-leer", label: "Guía", Icon: Compass, match: ["/como-leer"] },
 ];
 
@@ -25,7 +26,7 @@ export default function BottomNav() {
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`flex flex-col items-center gap-1 py-2.5 text-xs ${active ? "text-brand font-semibold" : "text-muted"}`}
+                className={`flex flex-col items-center gap-1 py-2.5 text-[11px] ${active ? "text-brand font-semibold" : "text-muted"}`}
               >
                 <Icon size={20} />
                 {label}
